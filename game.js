@@ -6,6 +6,8 @@ import { buildInterior } from './interiors.js';
 import { buildLugares } from './lugares.js';
 import { startNet } from './net.js';
 import { createCombat, makeWeaponMesh, placeHeld, WEAPONS, WIDS } from './combat.js';
+import { createNPC } from './npc.js';
+let npcTalk = null;
 // versão publicada na internet (não é o computador do jogador): esconde placas de endereço particulares
 const PUBLIC_SITE = !/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
 let combat = null, net = null; // armas e multiplayer (criados quando o jogo começa)
@@ -988,7 +990,8 @@ function poseMan(M, i, x, y, z, yaw, phase, amp, look, lie = 0, pose = null) {
   limb(M.legL, -0.13, 0.9, sw); limb(M.legR, 0.13, 0.9, -sw);
   // braços: mirando (1 = só o direito, 2 = as duas mãos), algemado (mãos para trás) ou balançando
   const up = -Math.PI / 2 - (pose?.pitch || 0);
-  if (pose?.cuff) { limb(M.armL, -0.3, 1.5, 0.55, -0.25); limb(M.armR, 0.3, 1.5, 0.55, 0.25); }
+  if (pose?.up) { limb(M.armL, -0.34, 1.5, Math.PI, 0.15); limb(M.armR, 0.34, 1.5, Math.PI, -0.15); }
+  else if (pose?.cuff) { limb(M.armL, -0.3, 1.5, 0.55, -0.25); limb(M.armR, 0.3, 1.5, 0.55, 0.25); }
   else if (pose?.aim === 2) { limb(M.armL, -0.3, 1.5, up, -0.55); limb(M.armR, 0.34, 1.5, up); }
   else if (pose?.aim === 1) { limb(M.armL, -0.34, 1.5, -sw * 0.5); limb(M.armR, 0.34, 1.5, up); }
   else { limb(M.armL, -0.34, 1.5, -sw * 0.8); limb(M.armR, 0.34, 1.5, sw * 0.8); }
@@ -1435,6 +1438,18 @@ function updatePeds(dt) {
       poseMan(PM, i, p.x, p.y, p.z, p.yaw, p.phase, mv ? 0.6 : 0, p.look, 0, { cuff: true });
       const q = loopPos(p.loop, p.s); p.off = [p.x - q[0], p.z - q[1]]; continue;
     }
+    // conversa / ordem do jogador (npc.js): mãos pra cima, deitar, seguir, parado, ouvindo
+    if (p.act && !(p.panic > 0)) {
+      p.act.time -= dt; const a = p.act.t;
+      const dx = player.x - p.x, dz = player.z - p.z, d = Math.hypot(dx, dz);
+      if (a === 'seguir' && d > 2 && d < 40 && !player.inCar) { const s = Math.min(d - 2, 3.4 * dt); p.x += dx / d * s; p.z += dz / d * s; p.phase += dt * 9; }
+      if (a !== 'deitar') p.yaw = Math.atan2(dx, dz);
+      const o = pushOut(p.x, p.z, 0.3); p.x = o.x; p.z = o.z; p.y = groundY(p.x, p.z);
+      if (a === 'deitar') poseMan(PM, i, p.x, p.y + 0.15, p.z, p.yaw, 0, 0, p.look, Math.PI / 2);
+      else poseMan(PM, i, p.x, p.y, p.z, p.yaw, p.phase, a === 'seguir' && d > 2 ? 0.6 : 0, p.look, 0, a === 'maos' ? { up: true } : null);
+      const q = loopPos(p.loop, p.s); p.off = [p.x - q[0], p.z - q[1]];
+      if (p.act.time <= 0) p.act = null; continue;
+    }
     // em pânico (tiros por perto): corre
     if (p.panic > 0) p.panic -= dt;
     if (p.free > 0) { p.free -= dt; p.x += 3 * dt; poseMan(PM, i, p.x, groundY(p.x, p.z), p.z, Math.PI / 2, p.phase += dt * 9, 0.8, p.look); continue; }
@@ -1507,6 +1522,7 @@ function frame(now) {
   }
   { const fov = cmode === 'scope' ? 14 : cmode === 'aim' ? 50 : 62; if (Math.abs(camera.fov - fov) > 0.05) { camera.fov += (fov - camera.fov) * Math.min(1, dt * 14 + (cmode === 'scope' ? 1 : 0)); camera.updateProjectionMatrix(); } }
   if (combat) combat.update(dt);
+  if (npcTalk) npcTalk.update(dt);
   sun.position.set(player.x + SUN_DIR.x * 200, SUN_DIR.y * 200, player.z + SUN_DIR.z * 200); sun.target.position.set(player.x, 0, player.z);
   for (const l of labels) { const d = Math.hypot(l.position.x - player.x, l.position.z - player.z); l.visible = !room && d < 170; }
   if (INT) { drawMini(INT.en.x, INT.en.z, camYaw); renderer.render(INT.R.scene, camera); requestAnimationFrame(frame); return; }
@@ -1567,7 +1583,8 @@ combat = createCombat({ THREE, scene, camera, canvas, player, peds, pushOut, gro
   remotes: () => net ? net.others : null, send: o => net && net.send(o), pitch: () => aimPitch,
   recoil: a => { camPitch = clamp(camPitch - a, -0.9, 1.35); },
   respawn: () => { if (player.inCar) toggleCar(); player.x = SPAWN.x; player.z = SPAWN.z; player.y = groundY(SPAWN.x, SPAWN.z) + 0.2; player.vx = player.vz = player.vy = 0; camTarget.set(player.x, 1.6, player.z); },
-  leaveCar: () => { if (player.inCar) { const c = player.inCar; c.mode = 'parked'; c.speed = 0; player.x = c.x + Math.sin(c.h) * 2.3; player.z = c.z - Math.cos(c.h) * 2.3; player.inCar = null; } } });
+  _x: 0, leaveCar: () => { if (player.inCar) { const c = player.inCar; c.mode = 'parked'; c.speed = 0; player.x = c.x + Math.sin(c.h) * 2.3; player.z = c.z - Math.cos(c.h) * 2.3; player.inCar = null; } } });
+npcTalk = createNPC({ THREE, camera, player, peds, combat, addChat, $ });
 btn.onclick = () => {
   $('intro').style.display = 'none'; Promise.resolve(canvas.requestPointerLock?.()).catch(() => {});
   const name = nickIn.value.trim().slice(0, 16) || 'Jogador'; try { localStorage.setItem('ilha_nome', name); } catch {}
