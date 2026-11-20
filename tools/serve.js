@@ -6,7 +6,7 @@ const root = path.join(__dirname, '..');
 const PORT = +process.env.PORT || 8080;
 const PUBLIC = process.env.PUBLIC === '1' || !!process.env.RENDER; // na hospedagem (Render) fica sempre público
 const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json', '.jsonl': 'text/plain; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.css': 'text/css' };
-const PUBLIC_FILES = /^\/(index\.html|game\.js|interiors\.js|lugares\.js|net\.js|combat\.js|data\/(world\.json|places\.json|overrides\.jsonl))$/;
+const PUBLIC_FILES = /^\/(index\.html|game\.js|interiors\.js|lugares\.js|net\.js|combat\.js|npc\.js|data\/(world\.json|places\.json|overrides\.jsonl))$/;
 const gzCache = new Map();
 
 const server = http.createServer((req, res) => {
@@ -15,6 +15,7 @@ const server = http.createServer((req, res) => {
     const f = path.basename(u.searchParams.get('f') || 'out.txt');
     const chunks = []; req.on('data', c => chunks.push(c)); req.on('end', () => { fs.writeFileSync(path.join(root, 'data', f), Buffer.concat(chunks)); res.end('ok'); }); return;
   }
+  if (req.method === 'POST' && u.pathname === '/npc') return npcRoute(req, res);
   if (req.method !== 'GET' && req.method !== 'HEAD') { res.statusCode = 405; return res.end(); }
   let rel = decodeURIComponent(u.pathname); if (rel === '/') rel = '/index.html';
   if (rel === '/healthz') return res.end('ok');
@@ -33,6 +34,57 @@ const server = http.createServer((req, res) => {
   }
   fs.createReadStream(p).pipe(res);
 });
+
+// ---------------------------------------------------------------- NPCs com IA (Google Gemini, plano grátis)
+// A chave fica só na variável de ambiente GEMINI_API_KEY (no Render). Sem chave, o jogo usa respostas prontas.
+const GEMINI_KEY = process.env.GEMINI_API_KEY || '';
+const GBASE = 'https://generativelanguage.googleapis.com/v1beta';
+const ACOES = ['nenhuma', 'maos', 'dinheiro', 'deitar', 'seguir', 'fugir', 'parar', 'liberar', 'policia'];
+let gModel = process.env.GEMINI_MODEL || '', gModelAt = 0;
+async function pickModel() { // escolhe um modelo "flash" disponível para a chave (os nomes mudam com o tempo)
+  if (gModel && (process.env.GEMINI_MODEL || Date.now() - gModelAt < 6 * 3600e3)) return gModel;
+  const r = await fetch(`${GBASE}/models?pageSize=200`, { headers: { 'x-goog-api-key': GEMINI_KEY } });
+  if (!r.ok) throw new Error('modelos ' + r.status);
+  const list = ((await r.json()).models || []).filter(m => (m.supportedGenerationMethods || []).includes('generateContent')).map(m => m.name.replace(/^models\//, ''));
+  const bad = /(image|tts|audio|live|embed|vision|learnlm|exp|preview|thinking)/i;
+  const score = n => (/flash/i.test(n) ? 100 : 0) + (/lite/i.test(n) ? -5 : 0) + (bad.test(n) ? -60 : 0) + (parseFloat((n.match(/(\d+(\.\d+)?)/) || [0, 0])[1]) || 0);
+  list.sort((a, b) => score(b) - score(a));
+  if (!list.length) throw new Error('nenhum modelo');
+  gModel = list[0]; gModelAt = Date.now(); console.log('NPC: usando o modelo', gModel); return gModel;
+}
+const npcRate = new Map(); let npcGlobal = [];
+function npcRoute(req, res) {
+  const send = (code, obj) => { res.statusCode = code; res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify(obj)); };
+  const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim(), now = Date.now();
+  const mine = (npcRate.get(ip) || []).filter(t => now - t < 60000); npcGlobal = npcGlobal.filter(t => now - t < 60000);
+  if (mine.length >= 8 || npcGlobal.length >= 40) return send(429, { erro: 'limite' });
+  let body = ''; req.on('data', c => { body += c; if (body.length > 6000) req.destroy(); });
+  req.on('end', async () => {
+    if (!GEMINI_KEY) return send(503, { erro: 'sem-chave' });
+    let m; try { m = JSON.parse(body); } catch { return send(400, { erro: 'json' }); }
+    const txt = clean(m.texto).slice(0, 220); if (!txt) return send(400, { erro: 'vazio' });
+    mine.push(now); npcRate.set(ip, mine); npcGlobal.push(now);
+    const p = m.persona || {}, ctx = m.ctx || {};
+    const sys = `Você é um NPC (pedestre) de um jogo de mundo aberto estilo GTA que se passa na Ilha dos Araújos, bairro de Governador Valadares (MG).
+Seu personagem: ${clean(p.nome).slice(0, 30)}, ${p.idade | 0} anos, ${clean(p.profissao).slice(0, 40)}, jeito ${clean(p.jeito).slice(0, 30)}.
+Situação agora: o jogador ${ctx.armado ? `está com ${clean(ctx.arma).slice(0, 20)} na mão` : 'está desarmado'}${ctx.mirando ? ' e APONTANDO a arma para você' : ''}. Você ${ctx.jaDeuDinheiro ? 'já entregou seu dinheiro para ele antes' : `tem R$ ${ctx.dinheiro | 0} na carteira`}.
+Responda SEMPRE em português do Brasil, coloquial e mineiro, em no máximo 2 frases curtas, como fala natural (vai virar voz). Fique sempre no personagem; não diga que é uma IA.
+Reaja de forma coerente com seu jeito e com a situação: com arma apontada, a maioria obedece com medo; desarmado, um assalto pode ser recusado, ignorado ou levar você a fugir.
+Escolha também UMA ação para o seu boneco fazer no jogo: nenhuma, maos (levantar as mãos), dinheiro (entregar o dinheiro), deitar (deitar no chão), seguir (seguir o jogador), fugir (sair correndo), parar (ficar parado), liberar (voltar a andar normal), policia (dizer que vai chamar a polícia e sair andando rápido).`;
+    const hist = (Array.isArray(m.hist) ? m.hist : []).slice(-8).map(h => ({ role: h.r === 'npc' ? 'model' : 'user', parts: [{ text: clean(h.t).slice(0, 220) }] }));
+    const payload = { systemInstruction: { parts: [{ text: sys }] }, contents: [...hist, { role: 'user', parts: [{ text: txt }] }],
+      generationConfig: { temperature: 0.9, maxOutputTokens: 1024, responseMimeType: 'application/json', responseSchema: { type: 'OBJECT', properties: { fala: { type: 'STRING' }, acao: { type: 'STRING', enum: ACOES } }, required: ['fala', 'acao'] } } };
+    try {
+      const model = await pickModel();
+      const r = await fetch(`${GBASE}/models/${model}:generateContent`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GEMINI_KEY }, body: JSON.stringify(payload) });
+      if (r.status === 429) return send(429, { erro: 'limite' });
+      if (!r.ok) { console.log('NPC: Gemini respondeu', r.status, (await r.text()).slice(0, 300)); if (r.status === 404) gModel = ''; return send(502, { erro: 'ia' }); }
+      const j = await r.json(), out = (j.candidates?.[0]?.content?.parts || []).map(x => x.text || '').join('');
+      let o; try { o = JSON.parse(out); } catch { o = { fala: out.slice(0, 200), acao: 'nenhuma' }; }
+      send(200, { fala: clean(o.fala).slice(0, 240) || '...', acao: ACOES.includes(o.acao) ? o.acao : 'nenhuma' });
+    } catch (e) { console.log('NPC: erro', e.message); send(502, { erro: 'ia' }); }
+  });
+}
 
 // ---------------------------------------------------------------- multiplayer
 const MAX_PLAYERS = 40, clients = new Map(); let nextId = 1;
