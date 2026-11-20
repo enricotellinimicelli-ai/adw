@@ -1,0 +1,8 @@
+{
+  "name": "ilha-dos-araujos",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Jogo 3D de mundo aberto da Ilha dos Araújos (Governador Valadares) com multiplayer",
+  "scripts": { "start": "node tools/serve.js" },
+  "engines": { "node": ">=18" }
+}
