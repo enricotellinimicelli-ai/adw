@@ -1,0 +1,184 @@
+// Ajustes de fidelidade — uma construção por linha.
+// "at": [x, z, rumo da câmera em graus, distância à frente (m), deslocamento p/ direita da imagem (m)]
+// Fonte: observação do Street View (jan/2025) e fotos/descrições de moradores. Só cores, andares e tipo — nada de imagem copiada.
+{"at":[222,-599,247,13,0],"type":"shop","floors":3,"color":"#c3c9d1","roof":"flat","note":"39 Av. São Francisco: prédio cinza-azulado, vidros, porta de aço"}
+{"at":[225,-559,272,14,-8],"type":"apt","floors":3,"color":"#d5d8dc","roof":"flat","note":"51 Av. São Francisco: prédio moderno cinza/branco"}
+{"at":[225,-559,272,14,8],"type":"res","floors":2,"color":"#e2d3b0","roof":"flat","note":"casa antiga bege com mural colorido, árvores grandes"}
+{"at":[222,-521,282,13,-10],"type":"shop","floors":1,"color":"#f2f2f2","band":"#1d1d1d","roof":"flat","note":"loja branca com fachada preta"}
+{"at":[222,-521,282,13,0],"type":"res","floors":2,"color":"#ece4cf","gate":"#8a4b2a","wall":"#8f8f8a","roof":"flat","note":"68 Av. São Francisco: casa bege, muro de pedra cinza, portões marrons"}
+{"at":[222,-521,282,13,10],"type":"shop","floors":2,"color":"#e6dccb","roof":"flat","note":"sobrado com varanda e loja de vidro"}
+{"at":[215,-482,94,13,8],"type":"res","floors":3,"color":"#e8cfc4","wall":"#e4dccb","roof":"flat","note":"117 Av. São Francisco: casa rosada de 3 andares"}
+{"at":[215,-482,94,16,-6],"type":"res","floors":1,"color":"#ece6d6","wall":"#e7e0cf","roof":"ceramic","note":"casas baixas creme na esquina"}
+{"at":[213,-442,94,13,-7],"type":"shop","floors":2,"color":"#f1ece6","roofColor":"#9b5a3c","roof":"ceramic","awning":"#b0553a","note":"159 Av. São Francisco: sobrado branco com telhado e lojinha de porta azul"}
+{"at":[213,-442,94,14,8],"type":"shop","floors":2,"color":"#c98a6a","band":"#3a3a3a","roof":"flat","note":"prédio cor de tijolo com vitrine escura"}
+{"at":[213,-442,274,16,0],"remove":true,"note":"estacionamento com piso de tijolo e árvore grande"}
+{"at":[213,-442,274,26,6],"remove":true,"note":"estacionamento (galpão ao fundo)"}
+{"at":[210,-402,274,14,-8],"type":"shop","floors":1,"color":"#e8c25a","band":"#7a4a21","roof":"flat","note":"200 Av. São Francisco: lojas amarelo/marrom atrás das árvores"}
+{"at":[210,-402,274,14,1],"type":"res","floors":2,"color":"#f4f4f2","wall":"#f4f4f2","gate":"#f0f0f0","roof":"flat","note":"casa branca com portão branco"}
+{"at":[210,-402,274,14,9],"type":"shop","floors":1,"color":"#e9e2d0","awning":"#e8b923","band":"#e8b923","roof":"flat","note":"bar com toldo amarelo e mesas vermelhas"}
+{"at":[204,-335,95,13,-9],"type":"shop","floors":3,"color":"#f2f2f0","band":"#3a78c2","roof":"flat","note":"248 Av. São Francisco: prédio branco de 3 andares, loja de placa azul"}
+{"at":[204,-335,95,13,0],"type":"shop","floors":3,"color":"#f2f2f0","band":"#d4452a","awning":"#d4452a","roof":"flat","note":"loja vermelha com porta amarela (doceria)"}
+{"at":[204,-335,95,13,9],"type":"shop","floors":2,"color":"#ecebe6","band":"#3c3c3c","roof":"flat","note":"loja branca com faixa cinza"}
+{"at":[200,-295,97,14,4],"type":"mod","floors":2,"color":"#5d6166","roof":"flat","note":"288 Av. São Francisco: casa cinza-escura com muro preto"}
+{"at":[200,-295,97,16,-8],"type":"res","floors":1,"color":"#e9e5dc","wall":"#4a4d50","gate":"#2b2b2b","roof":"ceramic","roofColor":"#8f4428","note":"casa térrea com muro escuro na esquina"}
+{"at":[287,-615,142,13,0],"type":"shop","floors":2,"color":"#b5553a","wall":"#f2f2f2","gate":"#f2f2f2","roof":"flat","note":"319 Rua Trinta: térreo de tijolo aparente, andar de cima branco curvo com brises"}
+{"at":[286,-679,38,15,6],"type":"shop","floors":2,"color":"#f0efea","band":"#d8d8d4","roof":"flat","note":"227 Praça Júlio Soares: prédio comercial branco com garagem aberta no térreo"}
+{"at":[289,-710,147,14,0],"type":"apt","floors":2,"color":"#e6dcc0","roof":"flat","note":"4340 Av. Rio Doce: prédio creme de 2 andares (institucional)"}
+{"at":[323,-732,147,15,-4],"type":"shop","floors":1,"color":"#ece4cc","band":"#c8322b","wall":"#c8322b","roof":"ceramic","roofColor":"#8f8a80","note":"4310 Av. Rio Doce: muro vermelho com painel e galpão creme"}
+{"at":[356,-754,147,15,0],"type":"res","floors":1,"color":"#f3f2ee","wall":"#f0efe9","gate":"#e8e8e8","roof":"flat","note":"4260 Av. Rio Doce: casa térrea branca grande atrás das árvores"}
+{"at":[423,-798,145,15,-3],"type":"mod","floors":2,"color":"#8a6a52","roof":"flat","note":"4199 Av. Rio Doce: casa moderna com fachada amadeirada"}
+{"at":[423,-798,145,15,9],"type":"mod","floors":2,"color":"#a7a9aa","roof":"flat","note":"casa moderna cinza com garagem"}
+{"at":[456,-821,145,16,5],"remove":true,"note":"4171 Av. Rio Doce: terreno vazio com tapume cinza"}
+{"at":[456,-821,145,15,-7],"type":"res","floors":2,"color":"#f2f2f0","wall":"#e8e8e4","roof":"flat","note":"casa branca"}
+{"at":[489,-843,154,15,0],"type":"res","floors":2,"color":"#f1f0ec","wall":"#c9c9c4","gate":"#8d8f8f","roof":"flat","note":"4100 Av. Rio Doce: casa branca, muro e portão cinza, ipê roxo na frente"}
+{"at":[582,-799,239,14,-5],"type":"mod","floors":2,"color":"#6b6e70","roof":"flat","note":"4019 Av. Rio Doce: sobrado moderno cinza-escuro, portão preto"}
+{"at":[582,-799,239,14,7],"type":"res","floors":1,"color":"#f3f2ee","wall":"#f0efea","roof":"flat","note":"casa térrea branca"}
+{"at":[614,-688,276,15,0],"type":"res","floors":2,"color":"#f2f1ec","wall":"#f2f1ec","gate":"#d8d8d4","roof":"flat","note":"3939 Av. Rio Doce: casa branca com detalhes verdes, muro branco comprido"}
+{"at":[595,-570,274,14,-3],"type":"res","floors":1,"color":"#cdb9a4","wall":"#cdb9a4","gate":"#6a4b33","roof":"ceramic","note":"3691 Av. Rio Doce: casa de esquina bege-rosada, muro da mesma cor"}
+{"at":[595,-570,274,22,10],"type":"apt","floors":4,"color":"#e7ece6","roof":"flat","note":"prédio de 4 andares verde-claro ao fundo"}
+{"at":[607,-533,246,15,0],"type":"mod","floors":2,"color":"#3f4246","roof":"flat","note":"3661 Av. Rio Doce: casa moderna grafite com vidros e palmeiras"}
+{"at":[607,-533,246,14,-10],"type":"res","floors":2,"color":"#e8d9b8","roof":"ceramic","note":"sobrado bege com telhado"}
+{"at":[624,-497,245,15,6],"type":"res","floors":2,"color":"#f0e6c6","wall":"#bdbdb8","roof":"ceramic","roofColor":"#6f4a36","note":"3582 Av. Rio Doce: sobrado creme com telhado escuro e muro cinza"}
+{"at":[643,-419,257,15,-6],"type":"res","floors":1,"color":"#f1efea","wall":"#ecebe6","gate":"#d0d0cc","roof":"ceramic","note":"Av. Rio Doce (esquina): casa térrea branca, muro branco"}
+{"at":[643,-419,257,24,10],"type":"apt","floors":4,"color":"#e7e2d8","roof":"flat","note":"prédio de 4 andares com telhado avançado"}
+{"at":[651,-380,258,15,-2],"type":"res","floors":1,"color":"#d9b45a","wall":"#d9b45a","gate":"#7a5a2c","roof":"ceramic","note":"3495 Av. Rio Doce: casinha de muro amarelo-mostarda"}
+{"at":[651,-380,258,15,8],"remove":true,"note":"terreno com tapume de zinco"}
+{"at":[650,-340,274,16,0],"type":"res","floors":2,"color":"#e9e6df","wall":"#d6d6d2","roof":"flat","note":"3491 Av. Rio Doce: casa atrás de árvores, muro cinza-claro comprido"}
+{"at":[620,-267,307,14,-8],"type":"mod","floors":2,"color":"#b9b8b2","roof":"flat","note":"3409 Av. Rio Doce: casa de concreto aparente com portão de garagem escuro"}
+{"at":[620,-267,307,15,8],"type":"apt","floors":4,"color":"#efd9b0","wall":"#c9a77a","roof":"flat","note":"prédio de 4 andares creme com faixas vermelhas e sacadas"}
+{"at":[596,-235,307,14,-6],"type":"res","floors":2,"color":"#e5c8a8","wall":"#e5c8a8","gate":"#6b4a2f","roof":"ceramic","note":"3391 Av. Rio Doce: sobrado pêssego com garagem de pergolado de madeira"}
+{"at":[596,-235,307,14,6],"type":"res","floors":2,"color":"#cfe0c8","wall":"#e8e8e4","gate":"#1d1d1d","roof":"ceramic","note":"casa verde-clara com sacada e portão preto"}
+{"at":[566,-209,320,16,0],"type":"mod","floors":2,"color":"#8d8e8c","wall":"#e3e3df","roof":"flat","note":"3340 Av. Rio Doce: muro branco comprido com arbustos, casa cinza atrás"}
+{"at":[508,-154,316,15,-5],"type":"res","floors":2,"color":"#e7d7b4","wall":"#7d7a73","gate":"#5a5a55","roof":"ceramic","roofColor":"#8a5a3c","note":"3291 Av. Rio Doce: casarão bege com janelas em arco e muro de pedra"}
+{"at":[508,-154,316,15,6],"type":"mod","floors":2,"color":"#f2f2f0","gate":"#3d6b52","roof":"flat","note":"parte moderna branca com portão de vidro verde"}
+{"at":[446,-103,323,16,-2],"type":"res","floors":3,"color":"#ebdfc5","wall":"#8b8378","gate":"#f2f2f0","roof":"ceramic","note":"3237 Av. Rio Doce: casa creme de 3 níveis, garagem branca, muro de pedra"}
+{"at":[478,-127,323,15,-6],"type":"shop","floors":2,"color":"#5f6266","wall":"#8a3d2c","roof":"flat","note":"3279 Av. Rio Doce: prédio cinza-escuro com muro de tijolo e placa"}
+{"at":[478,-127,323,15,7],"type":"mod","floors":2,"color":"#e8e6e0","roof":"flat","note":"casa moderna branca, garagem dupla branca"}
+{"at":[415,-79,323,15,0],"type":"res","floors":2,"color":"#ecebe6","wall":"#e8e6df","gate":"#e8e6df","roof":"flat","note":"3189 Av. Rio Doce: casa branca atrás de muro branco alto"}
+{"at":[383,-54,323,15,-5],"type":"res","floors":2,"color":"#ecebe6","wall":"#9c7a5a","gate":"#7a4a2a","roof":"flat","note":"3175 Av. Rio Doce: sobrado branco, muro de pedra marrom, portão de madeira"}
+{"at":[383,-54,323,15,8],"remove":true,"note":"terreno com mato"}
+{"at":[-71,588,355,15,-6],"type":"res","floors":2,"color":"#d8b99a","wall":"#c9b49a","roof":"ceramic","roofColor":"#8f4428","note":"2273 Av. Rio Doce: sobrado com telhado colonial e jardim florido"}
+{"at":[-71,588,355,26,-2],"type":"apt","floors":6,"color":"#efece6","roof":"flat","note":"prédio branco de 6 andares ao fundo"}
+{"at":[-111,591,355,14,-2],"type":"res","floors":3,"color":"#ebe7dc","wall":"#56606a","gate":"#f0f0ee","roof":"ceramic","roofColor":"#6f4a36","note":"2233 Av. Rio Doce: sobrado claro de 3 andares, muro cinza-azulado e portão branco"}
+{"at":[-111,591,355,18,10],"type":"res","floors":3,"color":"#efe6d6","roof":"ceramic","note":"sobrado creme vizinho"}
+{"at":[-181,619,318,15,-2],"type":"res","floors":2,"color":"#c8968a","wall":"#b9a58e","gate":"#a08f7a","roof":"ceramic","roofColor":"#7d4a36","note":"2153 Av. Rio Doce: sobrado rosado com janelas em arco, portão bege"}
+{"at":[-241,672,319,14,-7],"type":"res","floors":2,"color":"#f1f1ee","roof":"flat","note":"2026 Av. Rio Doce: casa branca"}
+{"at":[-241,672,319,15,5],"type":"res","floors":2,"color":"#e3d6be","wall":"#8b7d6a","gate":"#5a3a28","roof":"ceramic","note":"casa bege com muro de pedra e portão marrom"}
+{"at":[-393,802,328,15,-2],"type":"mod","floors":2,"color":"#e9e2d4","roof":"flat","note":"1867 Av. Rio Doce: sobrado claro com garagem branca"}
+{"at":[-393,802,328,14,8],"type":"apt","floors":3,"color":"#d6c3a5","roof":"flat","note":"prédio bege de 3 andares com vidro verde"}
+{"at":[-499,817,36,16,0],"type":"res","floors":2,"color":"#f1f0ec","wall":"#e4e3de","roof":"flat","note":"1736 Av. Rio Doce: casa branca atrás de muro branco alto e árvores"}
+{"at":[-559,765,53,14,-3],"type":"res","floors":2,"color":"#e7dcc6","wall":"#e7dcc6","gate":"#f2f2f0","roof":"flat","note":"1675 Av. Rio Doce: casa bege antiga"}
+{"at":[-559,765,53,14,7],"type":"res","floors":2,"color":"#bdb7ad","gate":"#2b2b2b","roof":"flat","note":"sobrado cinza com grade preta"}
+{"at":[-587,651,86,15,-8],"type":"res","floors":1,"color":"#ece6d6","wall":"#ece6d6","roof":"ceramic","note":"1559 Av. Rio Doce: casa térrea creme com telhado"}
+{"at":[-587,651,86,15,5],"type":"res","floors":2,"color":"#e9dcc4","wall":"#e3d6be","gate":"#8a5a3c","roof":"ceramic","note":"sobrado bege com portão marrom"}
+{"at":[-592,531,89,15,-6],"type":"mod","floors":3,"color":"#e5e4df","roof":"flat","note":"1431 Av. Rio Doce: sobrado moderno com vidros verdes e jardim"}
+{"at":[-592,531,89,15,7],"type":"mod","floors":2,"color":"#f0efea","roof":"flat","note":"casa branca com garagem"}
+{"at":[-583,372,98,15,-6],"remove":true,"note":"1289 Av. Rio Doce: terreno murado com árvores"}
+{"at":[-583,372,98,15,6],"type":"mod","floors":3,"color":"#ecebe6","gate":"#7a4a2a","roof":"flat","note":"sobrado branco moderno com vidros verdes e portão marrom"}
+{"at":[-565,294,116,16,0],"remove":true,"note":"1199 Av. Rio Doce: terreno vazio com mato"}
+{"at":[-548,258,116,16,0],"remove":true,"note":"terreno vazio"}
+{"at":[-529,223,124,16,0],"type":"res","floors":1,"color":"#d9c6ad","wall":"#cbb497","gate":"#cbb497","roof":"ceramic","roofColor":"#6f4a36","note":"1150 Av. Rio Doce: casa térrea atrás de muro bege comprido, palmeiras"}
+{"at":[-441,89,124,15,0],"type":"res","floors":2,"color":"#c47a5e","wall":"#c47a5e","roof":"flat","note":"957 Av. Rio Doce: casa de muro salmão/tijolo, árvores grandes"}
+{"at":[-370,-7,134,15,0],"type":"shop","floors":2,"color":"#f2f2f0","band":"#2b6aa8","roof":"flat","note":"851 Av. Rio Doce: prédio branco de 2 andares com vidros verdes, gramado e mastro"}
+{"at":[-370,-7,134,14,-10],"type":"shop","floors":2,"color":"#f0eee8","awning":"#c0392b","roof":"ceramic","note":"casa branca com toldo vermelho"}
+{"at":[-314,-64,134,14,-9],"type":"shop","floors":3,"color":"#ecebe6","band":"#c0392b","roof":"flat","note":"769 Av. Rio Doce: prédio branco com loja de faixa vermelha"}
+{"at":[-314,-64,134,14,0],"type":"res","floors":1,"color":"#2c3a5e","wall":"#2c3a5e","gate":"#2c3a5e","roof":"flat","note":"muro azul-marinho com flores pintadas"}
+{"at":[-314,-64,134,14,9],"type":"shop","floors":2,"color":"#d9c5a5","awning":"#e8e0cc","roof":"ceramic","note":"sobrado com antena parabólica e toldo"}
+{"at":[-255,-118,140,15,-4],"type":"res","floors":2,"color":"#f0eee9","wall":"#efede7","gate":"#7a4a2a","roof":"ceramic","note":"693 Av. Rio Doce: sobrado branco com portão de madeira"}
+{"at":[-165,-197,130,15,-4],"type":"apt","floors":6,"color":"#f1ece4","wall":"#e3d6be","gate":"#a89b3c","roof":"flat","note":"563 Av. Rio Doce: prédio de 6 andares com sacadas curvas salmão e portões verde-oliva"}
+{"at":[-73,-328,124,14,-8],"type":"shop","floors":2,"color":"#c98a5a","awning":"#d0342c","band":"#d0342c","roof":"flat","note":"383 Av. Rio Doce: loja de tijolo com toldo listrado vermelho"}
+{"at":[-73,-328,124,14,4],"type":"mod","floors":2,"color":"#d8c5a5","roof":"ceramic","note":"sobrados geminados bege com 3 garagens brancas"}
+{"at":[16,-460,123,15,-6],"type":"res","floors":1,"color":"#f2f1ec","wall":"#ece9e0","gate":"#f2f2f0","roof":"ceramic","roofColor":"#a5502e","note":"253 Av. Rio Doce: casa térrea branca com telhado"}
+{"at":[16,-460,123,15,7],"type":"res","floors":2,"color":"#e5ddcc","roof":"ceramic","roofColor":"#6f4a36","note":"casa com garagem de madeira (pergolado)"}
+{"at":[60,-528,123,15,0],"type":"shop","floors":3,"color":"#ece8df","awning":"#c25a8a","band":"#c25a8a","roof":"flat","note":"197 Av. Rio Doce: prédio com lojinha rosa e toldo, ipê roxo"}
+{"at":[60,-528,123,15,10],"type":"res","floors":1,"color":"#b5553a","wall":"#b5553a","roof":"flat","note":"muro de tijolo aparente"}
+{"at":[143,-612,143,15,4],"type":"apt","floors":4,"color":"#f2f1ed","wall":"#5a5d60","gate":"#4a4d50","roof":"flat","note":"141 Av. Rio Doce: prédio branco de 4 andares com 4 garagens cinza"}
+{"at":[143,-612,143,14,-9],"type":"res","floors":2,"color":"#e6c97a","roof":"ceramic","note":"sobrado amarelo"}
+{"at":[38,-494,303,14,-6],"remove":true,"note":"217 Av. Rio Doce: praça com gramado, árvores e quiosque de telhado verde-água, calçada portuguesa"}
+{"at":[38,-494,303,14,6],"remove":true,"note":"praça (quiosque)"}
+{"at":[38,-494,303,24,0],"remove":true,"note":"praça"}
+{"at":[332,47,285,16,-5],"type":"res","floors":2,"color":"#f1efe9","wall":"#ecebe6","roof":"ceramic","roofColor":"#a5502e","note":"2979 Av. Rio Doce: casa branca com telhado, muro branco comprido"}
+{"at":[332,47,285,16,8],"type":"res","floors":2,"color":"#dccbb0","wall":"#ecebe6","roof":"ceramic","roofColor":"#8f6a50","note":"sobrado bege com janelas quadradas"}
+{"at":[162,513,304,14,-6],"type":"mod","floors":2,"color":"#e6dcc8","gate":"#2b3340","roof":"flat","note":"2537 Av. Rio Doce: casa bege moderna com portão de garagem azul-escuro"}
+{"at":[162,513,304,14,6],"type":"mod","floors":2,"color":"#5f6266","gate":"#3a3d40","roof":"flat","note":"casa moderna cinza-escura"}
+{"at":[64,568,352,15,0],"type":"mod","floors":3,"color":"#e9e7e1","wall":"#d4c9b4","gate":"#2b2b2b","roof":"flat","note":"2449 Av. Rio Doce: casa moderna de 3 andares, muro bege, palmeiras"}
+{"at":[312,-39,51,15,0],"type":"res","floors":2,"color":"#f3f2ee","wall":"#f0efea","gate":"#f0efea","roof":"ceramic","roofColor":"#5a4a40","note":"390 Av. Paranaíba: casarão branco com janelas em arco e torreão, muro branco"}
+{"at":[312,-39,231,15,-5],"type":"mod","floors":2,"color":"#9a9894","gate":"#7a4a2a","roof":"flat","note":"sobrado cinza com portão de madeira"}
+{"at":[312,-39,231,15,6],"type":"res","floors":2,"color":"#ecebe6","wall":"#ecebe6","roof":"flat","note":"casa branca com varanda"}
+{"at":[287,-70,51,16,0],"type":"res","floors":1,"color":"#e6e0d2","wall":"#ddd8cc","roof":"ceramic","note":"367 Av. Paranaíba: casa térrea escondida por árvores"}
+{"at":[263,-102,53,15,-6],"type":"mod","floors":2,"color":"#ecebe6","gate":"#f2f2f0","roof":"flat","note":"313 Av. Paranaíba: casa branca moderna"}
+{"at":[263,-102,53,15,6],"type":"res","floors":1,"color":"#f1efe9","wall":"#efede7","roof":"flat","note":"casa térrea branca com friso cor de tijolo"}
+{"at":[239,-134,53,14,5],"type":"res","floors":2,"color":"#ecebe6","wall":"#b5553a","roof":"flat","note":"295 Av. Paranaíba (esquina): sobrado branco com detalhe de tijolo"}
+{"at":[216,-167,55,14,-7],"type":"mod","floors":2,"color":"#f0efea","gate":"#f2f2f0","roof":"flat","note":"255 Av. Paranaíba: sobrado branco, garagem branca, porta verde-água"}
+{"at":[216,-167,55,14,6],"type":"res","floors":1,"color":"#b5553a","wall":"#f2f1ec","gate":"#f2f1ec","roof":"flat","note":"casa com faixa de tijolo aparente e garagem dupla branca"}
+{"at":[133,-271,234,15,0],"type":"shop","floors":1,"color":"#3f8f5a","roof":"ceramic","roofColor":"#8f8a80","note":"211 Av. Paranaíba: galpão com muro verde"}
+{"at":[110,-304,54,15,-6],"type":"mod","floors":2,"color":"#f2f1ec","gate":"#d9d9d4","roof":"flat","note":"144 Av. Paranaíba: sobrado branco, garagem cinza-clara"}
+{"at":[110,-304,234,15,0],"type":"res","floors":2,"color":"#b9c4d0","wall":"#e8e4d8","gate":"#d0d0cc","roof":"flat","note":"sobrado azul-acinzentado"}
+{"at":[110,-304,234,15,7],"type":"res","floors":2,"color":"#e8d77a","roof":"flat","note":"sobrado amarelo"}
+{"at":[86,-335,50,15,-2],"type":"res","floors":2,"color":"#e9e5dc","wall":"#a58a72","gate":"#a58a72","roof":"ceramic","note":"114 Av. Paranaíba: casa atrás de muro de pedra, palmeira"}
+{"at":[86,-335,230,15,0],"type":"res","floors":1,"color":"#e6e0d2","wall":"#8b8378","roof":"ceramic","note":"muro de pedra comprido com palmeiras atrás"}
+{"at":[60,-366,50,15,0],"type":"res","floors":1,"color":"#e8dcc4","wall":"#ddd2bc","gate":"#ddd2bc","roof":"ceramic","roofColor":"#7d4a36","note":"83 Av. Paranaíba: casa térrea bege com muro decorado"}
+{"at":[60,-366,230,15,0],"remove":true,"note":"terreno murado com palmeira"}
+{"at":[36,-398,237,15,-6],"type":"res","floors":1,"color":"#e1d9c8","wall":"#d8cfbc","roof":"flat","note":"40 Av. Paranaíba: casa térrea bege atrás de muro"}
+{"at":[36,-398,237,15,7],"type":"shop","floors":1,"color":"#f0efea","awning":"#c0392b","band":"#c0392b","roof":"flat","note":"loja com faixa vermelha"}
+{"at":[153,-247,229,15,0],"type":"res","floors":1,"color":"#f0ece2","wall":"#6a3a2a","gate":"#efe9dc","roof":"ceramic","note":"257 Av. Paranaíba: muro marrom com losangos brancos"}
+{"at":[153,-247,229,18,12],"type":"shop","floors":1,"color":"#3f8f5a","roof":"flat","note":"muro verde da esquina"}
+{"at":[524,-237,60,15,4],"type":"mod","floors":2,"color":"#ecebe6","gate":"#8a4b2a","roof":"flat","note":"450 Av. Jequitinhonha: sobrado branco, portão de garagem marrom"}
+{"at":[501,-270,234,15,-6],"type":"shop","floors":3,"color":"#efd9b0","band":"#d35400","awning":"#d35400","roof":"flat","note":"404 Av. Jequitinhonha: prédio creme com loja de placa laranja (imóveis)"}
+{"at":[501,-270,234,15,7],"type":"res","floors":2,"color":"#f1f0ec","wall":"#ecebe6","roof":"flat","note":"casa branca com muro branco"}
+{"at":[501,-270,54,15,-2],"type":"mod","floors":3,"color":"#ecebe6","gate":"#3a3d40","roof":"flat","note":"Av. Jequitinhonha: sobrado branco moderno com vidros verdes"}
+{"at":[501,-270,54,15,8],"type":"mod","floors":2,"color":"#f2f1ec","roof":"flat","note":"casa branca com garagem"}
+{"at":[456,-336,237,15,-5],"type":"mod","floors":2,"color":"#8d8f90","gate":"#6a6c6e","roof":"flat","note":"319 Av. Jequitinhonha: casa cinza com garagem cinza"}
+{"at":[456,-336,237,15,8],"type":"shop","floors":1,"color":"#ecdcb5","awning":"#8a5a3c","roof":"ceramic","note":"casinhas creme com portas marrons"}
+{"at":[456,-336,57,15,-5],"type":"mod","floors":2,"color":"#f2f1ec","roof":"flat","note":"casa moderna branca com detalhe de tijolo"}
+{"at":[456,-336,57,15,7],"type":"res","floors":1,"color":"#ecebe6","wall":"#e3e3df","roof":"flat","note":"casa térrea branca"}
+{"at":[411,-402,54,15,0],"type":"res","floors":2,"color":"#f1eee6","wall":"#f1eee6","gate":"#5f88b5","roof":"flat","note":"255 Av. Jequitinhonha: sobrado branco com janelas em arco, portão azul"}
+{"at":[387,-434,237,16,0],"type":"apt","floors":4,"color":"#efd9a2","wall":"#2b3a9a","gate":"#2b3a9a","roof":"flat","note":"203 Av. Jequitinhonha: dois prédios amarelos de 4 andares com garagens azul-royal"}
+{"at":[365,-468,57,16,0],"type":"shop","floors":2,"color":"#f2f2f0","band":"#1f3c8c","wall":"#1f3c8c","roof":"flat","note":"150 Av. Jequitinhonha: prédio branco grande com faixa azul e base azul-marinho (escola)"}
+{"at":[344,-501,237,15,-5],"type":"res","floors":2,"color":"#ecebe6","wall":"#ecebe6","gate":"#2b2b2b","roof":"flat","note":"116 Av. Jequitinhonha: sobrado branco com portão de grade preta"}
+{"at":[344,-501,237,15,7],"type":"mod","floors":2,"color":"#e6e1d6","gate":"#f2f2f0","roof":"flat","note":"casa clara com garagem branca"}
+{"at":[322,-535,57,15,0],"type":"res","floors":1,"color":"#ece6d6","wall":"#f2f1ec","roof":"ceramic","roofColor":"#8f4428","note":"80 Av. Jequitinhonha: casa térrea com telhado e grade branca"}
+{"at":[322,-535,57,15,10],"type":"apt","floors":3,"color":"#c76b4a","roof":"flat","note":"prédio cor de tijolo"}
+{"at":[550,-444,147,15,0],"type":"res","floors":1,"color":"#e8d9a8","wall":"#a9a9a4","gate":"#a9a9a4","roof":"ceramic","roofColor":"#8f4428","note":"71 Av. Mucuri: casa térrea amarelada com varanda de madeira, muro cinza"}
+{"at":[516,-422,327,15,-3],"type":"mod","floors":2,"color":"#ecebe6","gate":"#9a9a96","roof":"flat","note":"96 Av. Mucuri: sobrado branco, portão cinza"}
+{"at":[383,-333,146,15,-5],"type":"res","floors":2,"color":"#f1f0ec","wall":"#ecebe6","roof":"flat","note":"266 Av. Mucuri: casa branca com colunas"}
+{"at":[383,-333,146,15,7],"type":"res","floors":1,"color":"#ece6d6","wall":"#c8b9a0","roof":"ceramic","note":"casa térrea com muro bege"}
+{"at":[317,-289,326,15,0],"type":"mod","floors":2,"color":"#f2f1ec","gate":"#2b2b2b","roof":"flat","note":"354 Av. Mucuri: casa branca com 3 portões pretos"}
+{"at":[317,-289,326,15,-10],"type":"res","floors":2,"color":"#d8c79a","wall":"#1f5fae","gate":"#7a2b22","roof":"ceramic","note":"muro azul e portão vinho, casa amarelada"}
+{"at":[251,-244,146,15,0],"type":"res","floors":2,"color":"#f2f1ec","wall":"#f2f1ec","roof":"ceramic","roofColor":"#8f2a1a","note":"427 Av. Mucuri: casa branca com varanda e telhado vermelho, garagem aberta"}
+{"at":[251,-244,146,15,-10],"type":"res","floors":1,"color":"#cdb79a","wall":"#b5553a","roof":"ceramic","note":"casa com mureta de tijolo"}
+{"at":[-43,315,215,15,0],"type":"res","floors":2,"color":"#ecebe6","wall":"#ecebe6","roof":"flat","note":"448 Av. Suassuí: casa atrás de muro branco e árvores (esquina)"}
+{"at":[23,361,34,15,0],"type":"mod","floors":2,"color":"#8a8c8e","gate":"#7a7c7e","roof":"flat","note":"501 Av. Suassuí: casa moderna cinza com faixa vermelha e vidros"}
+{"at":[23,361,34,15,-9],"type":"mod","floors":2,"color":"#f0efea","gate":"#b5553a","roof":"flat","note":"casa branca com portão de madeira"}
+{"at":[89,405,213,16,0],"type":"apt","floors":4,"color":"#f1ece2","wall":"#ecebe6","roof":"flat","note":"600 Av. Suassuí: prédio de 4 andares creme com detalhes vermelhos"}
+{"at":[-386,96,33,15,0],"type":"res","floors":2,"color":"#5fb08a","wall":"#d8d4c8","roof":"flat","note":"31 Av. Suassuí: sobrado verde com janela em arco"}
+{"at":[-318,139,212,15,-3],"type":"shop","floors":2,"color":"#f1f0ec","band":"#6a5aa8","roof":"flat","note":"119 Av. Suassuí: prédio branco com loja de faixa roxa"}
+{"at":[-318,139,212,15,8],"type":"res","floors":1,"color":"#e8e3d8","roof":"ceramic","roofColor":"#8f6a50","note":"casa térrea com garagem coberta"}
+{"at":[-251,182,32,15,-3],"type":"mod","floors":2,"color":"#f1f0ec","wall":"#8b8378","roof":"flat","note":"190 Av. Suassuí: casa branca de esquina com base de pedra"}
+{"at":[-251,182,32,16,10],"type":"apt","floors":3,"color":"#e9dcc6","roof":"flat","note":"prédio bege de 3 andares"}
+{"at":[-150,295,213,14,-3],"type":"shop","floors":2,"color":"#e07a3a","awning":"#f2f0ea","band":"#e8b923","roof":"flat","note":"318 Praça Itatiaia: sobrado laranja com loja e toldo branco"}
+{"at":[-150,295,213,14,8],"type":"mod","floors":2,"color":"#ece4cf","gate":"#a9a9a4","roof":"flat","note":"casa bege com 2 garagens cinza"}
+{"at":[-83,339,213,15,0],"type":"res","floors":1,"color":"#e6e0d2","wall":"#7f9bb5","gate":"#7f9bb5","roof":"ceramic","note":"378 Praça Itatiaia: casa escondida por árvores, muro azul-acinzentado (esquina)"}
+{"at":[-41,276,32,14,-3],"type":"res","floors":2,"color":"#f1eee6","roof":"ceramic","roofColor":"#6f4a36","note":"483 Praça Itatiaia: sobrado branco de esquina com telhado escuro, ipê roxo"}
+{"latlon":[-18.8694244,-41.9457552],"radius":25,"color":"#f2f2f0","band":"#1f5fae","note":"Igreja Batista da Ilha: muro branco com base azul e o nome escrito"}
+{"at":[156,450,215,15,-6],"type":"mod","floors":2,"color":"#c9cbcc","gate":"#3a3d40","roof":"flat","note":"665 Av. Suassuí: sobrados geminados cinza com portões escuros"}
+{"at":[156,450,215,15,6],"type":"mod","floors":2,"color":"#e8ddc8","gate":"#7a4a2a","roof":"flat","note":"sobrado bege com portão marrom"}
+{"at":[-51,26,33,6,-7],"type":"mod","floors":2,"color":"#ece6d8","gate":"#7a4a32","roof":"flat","note":"Rua Doze 437: sobrado branco com sacada e garagem marrom"}
+{"at":[-51,26,33,8,7],"type":"res","floors":2,"color":"#e3b9a0","gate":"#7a4a32","roof":"ceramic","note":"Rua Doze: sobrado rosado com sacada em arco"}
+{"at":[-7,-41,33,8,-7],"type":"res","floors":1,"color":"#e8dcc0","wall":"#efefea","gate":"#9a9a96","roof":"ceramic","note":"Rua Doze 370: casa bege atrás de muro branco"}
+{"at":[-7,-41,33,8,7],"type":"res","floors":2,"color":"#d9cbb0","gate":"#4a4d50","roof":"ceramic","note":"Rua Doze: casa bege com garagem cinza"}
+{"at":[36,-107,33,8,-7],"type":"mod","floors":2,"color":"#eeeeec","wall":"#e8e8e4","gate":"#555555","roof":"flat","note":"Rua Doze 271: sobrado branco, muro branco e portão grafite"}
+{"at":[36,-107,33,8,7],"type":"mod","floors":2,"color":"#8e9196","gate":"#5a5d60","roof":"flat","note":"Rua Doze: sobrado moderno cinza"}
+{"at":[-97,97,33,7,-7],"type":"mod","floors":2,"color":"#ece9e2","gate":"#6b6f73","roof":"flat","note":"Rua Doze 525: sobrado branco com garagem cinza"}
+{"at":[-97,97,33,22,-7],"type":"apt","floors":3,"color":"#e9e3d6","roof":"flat","note":"Rua Doze: prédio branco de 3 andares"}
+{"at":[-97,97,33,9,7],"type":"res","floors":1,"color":"#e6d6b4","wall":"#e2d2b0","roof":"ceramic","note":"Rua Doze: casa creme com muro alto"}
+// Fotos do jogador (jan/2025): Rua Doze perto da Praça da Maçonaria
+{"at":[-155,189,305,10,-5],"type":"mod","floors":2,"color":"#f0eeea","wall":"#9a6a50","gate":"#f2f2f0","roof":"flat","note":"648 Rua Doze: sobrado branco com janelas em arco, muro de tijolinho e 2 garagens brancas"}
+{"at":[-155,189,305,10,6],"type":"res","floors":2,"color":"#d8c4a8","roof":"ceramic","roofColor":"#6b3a2a","wall":"#e8e0d4","gate":"#c9b39a","note":"Rua Doze: sobrado bege com varandas e telhado marrom"}
+{"at":[-144,172,305,10,4],"type":"res","floors":2,"color":"#c79a86","roof":"ceramic","roofColor":"#7a4a36","wall":"#c79a86","gate":"#f2f2f2","note":"599 Rua Doze: sobrado revestido de cerâmica rosada com varanda de madeira e portões brancos de grade"}
+{"at":[-134,155,305,9,-2],"type":"res","floors":1,"color":"#efe7da","roof":"ceramic","roofColor":"#8a4a30","wall":"#6b3f2a","gate":"#6b3f2a","note":"606 Rua Doze: casa térrea creme com janelas em arco e grade marrom"}
+{"at":[-134,155,305,10,7],"type":"mod","floors":2,"color":"#f1f1ef","gate":"#2e2f31","roof":"flat","note":"Rua Doze: sobrado branco com portão preto"}
+{"at":[-149,207,300,16,-4],"type":"apt","floors":3,"color":"#e6e0e6","roof":"flat","note":"265 Praça Itatiaia: prédio de 3 andares branco e lilás com vidros verdes"}
+{"at":[-149,207,300,16,8],"type":"res","floors":2,"color":"#e9c9c4","gate":"#f4f4f4","roof":"ceramic","note":"Praça Itatiaia: sobrado rosado com janelas em arco e garagens brancas"}
+{"pos":[-144.1,135.5],"radius":3,"remove":true,"note":"modelo próprio em lugares.js"}
+{"pos":[-135.1,127],"radius":3,"type":"mod","floors":2,"color":"#8f9296","gate":"#f2f2f2","wall":"#8f9296","roof":"flat","note":"Rua Doze: sobrado cinza com porta de enrolar branca"}

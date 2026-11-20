@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ilha dos Araújos</title>
+<style>
+  :root { --bg:#0e1116; --fg:#f3f3f3; --muted:#b9c0c8; --accent:#ffcc33; --panel:rgba(12,15,20,.72); }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--fg); font-family: system-ui, "Segoe UI", Roboto, sans-serif; overflow:hidden; }
+  canvas#game { display:block; width:100vw; height:100vh; }
+  .hud { position:fixed; pointer-events:none; text-shadow:0 1px 3px #000; }
+  #place { top:14px; left:16px; }
+  #place .bairro { font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); }
+  #place .rua { font-size:22px; font-weight:700; }
+  #speed { right:20px; bottom:18px; font-size:34px; font-weight:800; text-align:right; }
+  #speed small { font-size:13px; font-weight:600; color:var(--muted); display:block; }
+  #hint { left:50%; bottom:28px; transform:translateX(-50%); background:var(--panel); padding:8px 14px; border-radius:8px; font-size:15px; display:none; }
+  #mini { top:14px; right:14px; width:190px; height:190px; border-radius:50%; border:3px solid rgba(255,255,255,.8); box-shadow:0 2px 10px rgba(0,0,0,.5); }
+  #help { left:16px; bottom:16px; background:var(--panel); padding:10px 12px; border-radius:8px; font-size:13px; line-height:1.55; color:var(--muted); }
+  #help b { color:var(--fg); }
+  #bigmap { position:fixed; inset:0; background:rgba(0,0,0,.82); display:none; align-items:center; justify-content:center; z-index:5; }
+  #bigmap canvas { max-width:94vw; max-height:94vh; border-radius:8px; }
+  #intro { position:fixed; inset:0; z-index:10; display:flex; align-items:center; justify-content:center; background:radial-gradient(ellipse at center, #1d2833 0%, #0b0e12 75%); }
+  #intro .card { max-width:520px; margin:16px; padding:28px; text-align:center; }
+  #intro h1 { margin:0 0 4px; font-size:40px; letter-spacing:.02em; }
+  #intro .sub { color:var(--accent); font-weight:600; margin-bottom:18px; }
+  #intro p { color:var(--muted); line-height:1.5; }
+  #intro button { margin-top:14px; font-size:18px; font-weight:700; padding:12px 28px; border-radius:10px; border:0; background:var(--accent); color:#111; cursor:pointer; }
+  #intro button:disabled { opacity:.5; cursor:wait; }
+  #loadmsg { margin-top:10px; font-size:13px; color:var(--muted); min-height:1em; }
+  #nick { margin-top:10px; font-size:16px; padding:10px 12px; border-radius:8px; border:1px solid #445; background:#151a21; color:var(--fg); width:220px; text-align:center; }
+  #online { top:62px; left:16px; font-size:13px; color:#9fd3ff; }
+  #chatlog { left:16px; bottom:96px; width:min(420px,80vw); font-size:14px; line-height:1.45; }
+  #chatlog div { background:rgba(12,15,20,.6); padding:2px 8px; border-radius:6px; margin-top:3px; width:fit-content; max-width:100%; transition:opacity .6s; }
+  #chatlog b { color:#9fd3ff; } #chatlog i { color:#ffd34d; font-style:normal; }
+  #chatin { position:fixed; left:16px; bottom:60px; width:min(420px,80vw); font-size:15px; padding:8px 10px; border-radius:8px; border:1px solid #556; background:rgba(12,15,20,.9); color:#fff; display:none; z-index:6; }
+  @media (max-width:700px){ #mini{ width:120px; height:120px; } #help{ display:none; } #place .rua{ font-size:17px; } }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="place" class="hud"><div class="bairro">Ilha dos Araújos · Gov. Valadares</div><div class="rua" id="rua">—</div></div>
+<canvas id="mini" class="hud" width="190" height="190"></canvas>
+<div id="online" class="hud"></div>
+<div id="chatlog" class="hud"></div>
+<input id="chatin" maxlength="140" placeholder="Mensagem… (Enter envia, Esc cancela)" autocomplete="off">
+<div id="speed" class="hud"></div>
+<div id="hint" class="hud"></div>
+<div id="help" class="hud">
+  <b>WASD</b> andar / dirigir · <b>Shift</b> correr · <b>Espaço</b> pular / freio de mão<br>
+  <b>E</b> entrar/sair do carro · lojas, Coelho Diniz e Paróquia: entre pela porta · <b>Mouse</b> girar câmera · <b>Roda</b> zoom<br>
+  <b>Tab</b> armas · <b>'</b> inventário · <b>Botão direito</b> mirar · <b>Clique</b> atirar / algemar · <b>R</b> recarregar<br>
+  <b>M</b> mapa (clique marca destino, roda dá zoom) · <b>T</b> ir até o marcador · <b>+ / −</b> zoom do minimapa · <b>G</b> liga/desliga sombras (mais bonito, mais pesado) · <b>F</b> mostrar FPS · <b>Enter</b> chat · <b>H</b> esconder ajuda
+</div>
+<div id="bigmap"><canvas id="bigcanvas"></canvas></div>
+<div id="intro"><div class="card">
+  <h1>Ilha dos Araújos</h1>
+  <div class="sub">Governador Valadares · MG</div>
+  <p>Ruas, quarteirões, praças e pontes nas posições reais (dados do OpenStreetMap e da prefeitura). As casas são geradas dentro dos quarteirões de verdade e vão ficando fiéis à medida que os lugares são revisados.</p>
+  <div><input id="nick" maxlength="16" placeholder="Seu nome no jogo" autocomplete="off"></div>
+  <button id="play" disabled>Carregando…</button>
+  <div id="loadmsg"></div>
+</div></div>
+<script type="module" src="game.js"></script>
+</body>
+</html>
