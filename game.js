@@ -1441,12 +1441,17 @@ function updatePeds(dt) {
     // conversa / ordem do jogador (npc.js): mãos pra cima, deitar, seguir, parado, ouvindo
     if (p.act && !(p.panic > 0)) {
       p.act.time -= dt; const a = p.act.t;
+      // refém dentro do carro: some junto com o carro e desce quando o jogador desce
+      if (a === 'seguir') {
+        if (player.inCar && (p.riding || Math.hypot(player.x - p.x, player.z - p.z) < 9)) { p.riding = true; p.x = player.x; p.z = player.z; poseMan(PM, i, 0, -60, 0, 0, 0, 0); continue; }
+        if (p.riding && !player.inCar) { p.riding = false; p.x = player.x + 1.4; p.z = player.z + 1.0; }
+      }
       const dx = player.x - p.x, dz = player.z - p.z, d = Math.hypot(dx, dz);
-      if (a === 'seguir' && d > 2 && d < 40 && !player.inCar) { const s = Math.min(d - 2, 3.4 * dt); p.x += dx / d * s; p.z += dz / d * s; p.phase += dt * 9; }
+      if (a === 'seguir' && d > 2 && d < 40 && !player.inCar) { const s = Math.min(d - 2, (d > 5 ? 6.8 : 3.4) * dt); p.x += dx / d * s; p.z += dz / d * s; p.phase += dt * 9; }
       if (a !== 'deitar') p.yaw = Math.atan2(dx, dz);
       const o = pushOut(p.x, p.z, 0.3); p.x = o.x; p.z = o.z; p.y = groundY(p.x, p.z);
       if (a === 'deitar') poseMan(PM, i, p.x, p.y + 0.15, p.z, p.yaw, 0, 0, p.look, Math.PI / 2);
-      else poseMan(PM, i, p.x, p.y, p.z, p.yaw, p.phase, a === 'seguir' && d > 2 ? 0.6 : 0, p.look, 0, a === 'maos' ? { up: true } : null);
+      else poseMan(PM, i, p.x, p.y, p.z, p.yaw, p.phase, a === 'seguir' && d > 2 ? 0.6 : 0, p.look, 0, a === 'maos' || (a === 'seguir' && p.act.up) ? { up: true } : null);
       const q = loopPos(p.loop, p.s); p.off = [p.x - q[0], p.z - q[1]];
       if (p.act.time <= 0) p.act = null; continue;
     }
@@ -1590,7 +1595,7 @@ btn.onclick = () => {
   const name = nickIn.value.trim().slice(0, 16) || 'Jogador'; try { localStorage.setItem('ilha_nome', name); } catch {}
   if (!net) net = startNet({ THREE, scene, makePeople, poseMan, flushPeople, palettes: { SKIN, SHIRT, PANTS, HAIR }, makeWeaponMesh, placeHeld, WEAPONS, WIDS, onEvent: m => combat && combat.onNet(m) }, name, netState, addChat, s => { $('online').textContent = '● ' + s; });
 };
-window.__game = { frame: (t) => frame(t), player, cars, buildings, W, scene, camera, toLocal, landmarks, renderer, enterables, enterPlace, leavePlace, getInt: () => INT, setWaypoint, teleport, openBig, mv, getRoute: () => route, getWp: () => wp, PROF, getCombat: () => combat, getNet: () => net, peds, setPitch: p => { camPitch = p; },
+window.__game = { frame: (t) => frame(t), player, cars, buildings, W, scene, camera, toLocal, landmarks, renderer, enterables, enterPlace, leavePlace, getInt: () => INT, setWaypoint, teleport, openBig, mv, getRoute: () => route, getWp: () => wp, PROF, getCombat: () => combat, getNpc: () => npcTalk, toggleCar: () => toggleCar(), getNet: () => net, peds, setPitch: p => { camPitch = p; },
   setCam: (yaw, pitch, dist) => { camYaw = yaw; camPitch = pitch; camDist = dist; },
   snap: async (name, w = 1280, h = 720) => { // foto do jogo (para revisão)
     renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.render(INT ? INT.R.scene : scene, camera);

@@ -18,8 +18,28 @@ const FALAS = {
   fugir: ['Socorro!', 'Tô indo embora, tô indo!', 'Vou sair fora daqui!'], parar: ['Tá, tô parado.', 'Fiquei aqui, ó.'], liberar: ['Graças a Deus...', 'Posso ir? Valeu...', 'Ufa.'],
   generico: ['Oi? Fala de novo que eu não entendi.', 'Uai, não sei não, sô.', 'Hum... tá bom.', 'Tô com pressa, depois a gente conversa.', 'Ô trem bão, sô!'],
 };
+// conversa básica sem IA (quando a IA não responde): nome, idade, trabalho, cumprimentos, perguntas comuns
+function papo(t, ctx, ped) {
+  const P = ped.persona, r = Math.random();
+  if (ctx.armado) { // amor à vida: com arma na mão do jogador, qualquer conversa vira súplica
+    if (/(quer morrer|vou te matar|te mato|vai morrer|atiro|vou atirar)/.test(t)) return { fala: pick(['Não! Pelo amor de Deus, não me mata, eu tenho família!', 'Por favor, eu faço o que você quiser, só não atira!', 'Eu não quero morrer, moço, por favor!'], r), acao: 'maos' };
+  }
+  if (/^(oi|ola|opa|eae|e ai|salve|bom dia|boa tarde|boa noite|fala ai|fala)\b/.test(t)) return { fala: ctx.armado ? pick(['O-oi... abaixa essa arma, por favor...', 'Oi... tá tudo bem? Não precisa disso não...'], r) : pick([`Opa, tudo bom? Eu sou ${P.nome}.`, 'E aí, beleza?', `Oi! ${/dia/.test(t) ? 'Bom dia' : /tarde/.test(t) ? 'Boa tarde' : /noite/.test(t) ? 'Boa noite' : 'Tudo certo'} pra você também.`], r), acao: 'nenhuma' };
+  if (/(seu nome|como (voce|vc|ce|tu) (se )?chama|quem e (voce|vc)|qual e (o )?(seu|teu) nome)/.test(t)) return { fala: ctx.armado ? `Meu nome é ${P.nome.replace(/^(Seu|Dona|Tia) /, '')}... por favor, não me machuca.` : `Me chamo ${P.nome}, prazer!`, acao: 'nenhuma' };
+  if (/(quantos anos|sua idade|qual (a )?sua idade)/.test(t)) return { fala: `Tenho ${P.idade} anos${P.idade > 60 ? ', já tô velho pra essas coisas' : ''}.`, acao: 'nenhuma' };
+  if (/(trabalha|profissao|o que (voce|vc|ce) faz|faz o que)/.test(t)) return { fala: `Eu sou ${P.profissao}, aqui mesmo na Ilha.`, acao: 'nenhuma' };
+  if (/(tudo bem|tudo bom|como (voce|vc) (ta|esta)|como vai|beleza)/.test(t)) return { fala: ctx.armado ? 'Tava tudo bem até agora...' : pick(['Tudo tranquilo, graças a Deus. E você?', 'Na luta, mas tô bem!', 'De boa, e contigo?'], r), acao: 'nenhuma' };
+  if (/(onde (fica|e|tem)|como (chego|faco pra chegar)|sabe onde)/.test(t)) return { fala: pick(['Uai, fica ali pra frente, perto da praça. Só seguir reto.', 'Acho que é lá perto da Rio Doce, pergunta no Coelho Diniz que eles sabem.', 'Ih, não sei te dizer não, eu mal saio de casa.'], r), acao: 'nenhuma' };
+  if (/(obrigad|valeu|brigad)/.test(t)) return { fala: pick(['Por nada!', 'Imagina, tamo junto.', 'Disponha!'], r), acao: ctx.armado ? 'nenhuma' : 'liberar' };
+  if (/(time|flamengo|cruzeiro|atletico|galo|futebol)/.test(t)) return { fala: pick(['Sou Galo doente, uai!', 'Cruzeiro até morrer!', 'Flamengo, igual metade da cidade kkk.'], r), acao: 'nenhuma' };
+  return null;
+}
 function regras(t, ctx, ped) {
   const armado = ctx.armado;
+  // sequestro: com arma, a pessoa obedece e vai junto (até dentro do carro)
+  if (/(sequestr|entra no carro|vem comigo|anda logo|bora|me acompanha|vem ca|vem cá|vamos|anda na frente|vai comigo)/.test(t))
+    return armado ? { fala: pick(['Tá bom, tá bom, eu vou! Só não me machuca!', 'Eu vou, eu vou... por favor, eu tenho filho!', 'Calma, eu tô indo com você, não precisa atirar!'], Math.random()), acao: 'seguir' }
+                  : { fala: pick(['Ir com você pra onde? Nem te conheço!', 'Vou nada, tá doido?'], Math.random()), acao: ped.persona.jeito === 'simpático' ? 'seguir' : 'nenhuma' };
   if (/(assalt|passa (o |a |tudo|a carteira|o celular|o dinheiro|a grana)|perdeu|perdeu playboy|me da (o|a) (dinheiro|carteira|celular|grana)|passa ai|passa logo|mao no bolso)/.test(t)) {
     if (ped.roubado) return { fala: pick(FALAS.jaDeu, Math.random()), acao: 'maos' };
     if (!armado) { const v = ped.persona.jeito; if (v === 'medroso' || v === 'nervoso') return { fala: pick(FALAS.dinheiro.medo, Math.random()), acao: 'dinheiro' }; return { fala: pick(FALAS.semArma, Math.random()), acao: v === 'valente' ? 'nenhuma' : 'fugir' }; }
@@ -27,7 +47,7 @@ function regras(t, ctx, ped) {
   }
   if (/(mao(s)? (pra|para) cima|levanta (a|as) mao|maos ao alto|mao na cabeca|levanta a mao)/.test(t)) return { fala: pick(armado ? FALAS.maos.medo : FALAS.maos.brabo, Math.random()), acao: 'maos' };
   if (/(deita|no chao|cara no chao|deita no chao)/.test(t)) return { fala: pick(FALAS.deitar, Math.random()), acao: armado ? 'deitar' : 'nenhuma' };
-  if (/(vem comigo|me segue|segue eu|me acompanha|bora comigo|vem cá|vem ca)/.test(t)) return { fala: pick(FALAS.seguir, Math.random()), acao: 'seguir' };
+  if (/(me segue|segue eu|bora comigo)/.test(t)) return { fala: pick(FALAS.seguir, Math.random()), acao: 'seguir' };
   if (/(sai daqui|vaza|some daqui|corre|ralar|vai embora|rala peito)/.test(t)) return { fala: pick(FALAS.fugir, Math.random()), acao: 'fugir' };
   if (/(fica parado|para ai|parado ai|nao se mexe|fica quieto)/.test(t)) return { fala: pick(FALAS.parar, Math.random()), acao: 'parar' };
   if (/(pode ir|ta liberado|esta liberado|libera|vai em paz|tchau)/.test(t)) return { fala: pick(FALAS.liberar, Math.random()), acao: 'liberar' };
@@ -72,8 +92,10 @@ export function createNPC(ctx) {
     return best;
   }
   // ---- aplicar a ação no boneco
-  function agir(p, acao) {
-    p.panic = 0; p.act = null;
+  function agir(p, acao, c = {}) {
+    p.panic = 0; const eraRefem = p.act && p.act.t === 'seguir' && acao !== 'liberar' && acao !== 'fugir'; p.act = null;
+    if (eraRefem && acao !== 'seguir') { p.act = { t: 'seguir', time: 600, up: c.armado }; if (acao === 'dinheiro' && !p.roubado) { p.roubado = true; const v = p.dinheiro; setTimeout(() => { st.money += v; hud(); addChat('', `${p.persona.nome} te entregou R$ ${v}`); }, 900); } return; }
+    if (acao === 'seguir') { p.act = { t: 'seguir', time: 600, up: c.armado }; return; } // refém: vai junto (até no carro)
     if (acao === 'maos') p.act = { t: 'maos', time: 25 };
     if (acao === 'dinheiro') { p.act = { t: 'maos', time: 20 }; if (!p.roubado) { const v = p.dinheiro; p.roubado = true; setTimeout(() => { st.money += v; hud(); addChat('', `${p.persona.nome} te entregou R$ ${v}`); }, 900); } }
     if (acao === 'deitar') p.act = { t: 'deitar', time: 25 };
@@ -88,19 +110,22 @@ export function createNPC(ctx) {
     texto = (texto || '').trim(); if (!texto) return; const p = alvo();
     voce.textContent = '“' + texto + '”'; voce.style.display = 'block'; voceT = 4;
     if (!p) { dica.textContent = 'Ninguém perto para ouvir'; dica.style.display = 'block'; setTimeout(() => dica.style.display = 'none', 1800); return; }
-    p.act = { t: 'ouvir', time: 10 }; p.talkYaw = Math.atan2(player.x - p.x, player.z - p.z);
+    if (!(p.act && p.act.t === 'seguir')) p.act = { t: 'ouvir', time: 10 }; p.talkYaw = Math.atan2(player.x - p.x, player.z - p.z);
     const W = combat ? combat.st.w : '', armado = !!(W && W !== 'algema'), ctx2 = { armado, arma: W, mirando: !!(combat && combat.st.aiming && armado), dinheiro: p.dinheiro, jaDeuDinheiro: !!p.roubado };
     let r = regras(norm(texto), ctx2, p);
+    // com arma na mão, ninguém é valente: sem IA, ele obedece ordens básicas por amor à vida
     if (!r) { // conversa livre: IA do servidor
       if (st.busy) return; st.busy = true; mostrar(p, '…');
       try { const res = await fetch('/npc', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ texto, persona: p.persona, ctx: ctx2, hist: p.hist.slice(-8) }) });
+        if (res.status === 503 && !st.avisouChave) { st.avisouChave = true; addChat('', 'IA dos NPCs desligada: falta a chave GEMINI_API_KEY no servidor (usando respostas prontas)'); }
+        if (res.status === 502 && !st.avisouErro) { st.avisouErro = true; addChat('', 'A IA dos NPCs deu erro agora; usando respostas prontas'); }
         if (res.ok) r = await res.json(); else if (res.status === 429) r = { fala: pick(['Peraí que eu tô cansado de conversar, fala comigo daqui a pouco.', 'Ô, muita gente falando comigo, dá um tempo!'], Math.random()), acao: 'nenhuma' };
       } catch {}
       st.busy = false;
-      if (!r || !r.fala) r = { fala: pick(FALAS.generico, Math.random()), acao: 'nenhuma' };
+      if (!r || !r.fala) r = papo(norm(texto), ctx2, p) || { fala: ctx2.armado ? pick(['Por favor, eu faço o que você mandar, só não atira!', 'Fala o que você quer, eu faço, juro!'], Math.random()) : pick(FALAS.generico, Math.random()), acao: ctx2.armado ? 'maos' : 'nenhuma' };
     }
     p.hist.push({ r: 'eu', t: texto }, { r: 'npc', t: r.fala }); if (p.hist.length > 16) p.hist.splice(0, p.hist.length - 16);
-    mostrar(p, r.fala); falar(p, r.fala); agir(p, r.acao);
+    mostrar(p, r.fala); falar(p, r.fala); agir(p, r.acao, ctx2);
   }
   // ---- microfone (Chrome): segurar V
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition; let rec = null, ouvido = '';

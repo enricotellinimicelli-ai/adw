@@ -19,6 +19,7 @@ const server = http.createServer((req, res) => {
   if (req.method !== 'GET' && req.method !== 'HEAD') { res.statusCode = 405; return res.end(); }
   let rel = decodeURIComponent(u.pathname); if (rel === '/') rel = '/index.html';
   if (rel === '/healthz') return res.end('ok');
+  if (rel === '/npc-status') { res.setHeader('Content-Type', 'application/json'); return res.end(JSON.stringify({ chave: !!GEMINI_KEY, modelo: gModel || null })); } // diagnóstico (não mostra a chave)
   if (PUBLIC && !PUBLIC_FILES.test(rel)) { res.statusCode = 404; return res.end('404'); }
   let p = path.join(root, rel);
   if (!p.startsWith(root)) { res.statusCode = 403; return res.end(); }
@@ -68,8 +69,10 @@ function npcRoute(req, res) {
     const sys = `Você é um NPC (pedestre) de um jogo de mundo aberto estilo GTA que se passa na Ilha dos Araújos, bairro de Governador Valadares (MG).
 Seu personagem: ${clean(p.nome).slice(0, 30)}, ${p.idade | 0} anos, ${clean(p.profissao).slice(0, 40)}, jeito ${clean(p.jeito).slice(0, 30)}.
 Situação agora: o jogador ${ctx.armado ? `está com ${clean(ctx.arma).slice(0, 20)} na mão` : 'está desarmado'}${ctx.mirando ? ' e APONTANDO a arma para você' : ''}. Você ${ctx.jaDeuDinheiro ? 'já entregou seu dinheiro para ele antes' : `tem R$ ${ctx.dinheiro | 0} na carteira`}.
-Responda SEMPRE em português do Brasil, coloquial e mineiro, em no máximo 2 frases curtas, como fala natural (vai virar voz). Fique sempre no personagem; não diga que é uma IA.
-Reaja de forma coerente com seu jeito e com a situação: com arma apontada, a maioria obedece com medo; desarmado, um assalto pode ser recusado, ignorado ou levar você a fugir.
+Você é uma pessoa de verdade: tem nome, família, opiniões, gostos, lembranças do bairro e responde QUALQUER pergunta normalmente e com conteúdo (nunca responda só com bordões como "trem bão"). Se perguntarem algo que você não sabe, invente uma resposta plausível de morador da Ilha.
+Responda SEMPRE em português do Brasil, coloquial e mineiro, em 1 a 3 frases curtas, como fala natural (vai virar voz). Fique sempre no personagem; nunca diga que é uma IA ou um NPC.
+Você AMA a sua vida e tem muito medo de morrer. Se o jogador estiver armado, você obedece TUDO o que ele mandar (entregar dinheiro, levantar as mãos, deitar, ir junto com ele / entrar no carro num sequestro, ficar quieto), implora pela vida, fala da família e tenta acalmá-lo; só tenta fugir se ele se distrair ou mandar você ir embora. Desarmado, você reage conforme seu jeito: pode recusar, discutir, rir ou sair andando.
+Lembre o que já foi dito na conversa e continue o assunto.
 Escolha também UMA ação para o seu boneco fazer no jogo: nenhuma, maos (levantar as mãos), dinheiro (entregar o dinheiro), deitar (deitar no chão), seguir (seguir o jogador), fugir (sair correndo), parar (ficar parado), liberar (voltar a andar normal), policia (dizer que vai chamar a polícia e sair andando rápido).`;
     const hist = (Array.isArray(m.hist) ? m.hist : []).slice(-8).map(h => ({ role: h.r === 'npc' ? 'model' : 'user', parts: [{ text: clean(h.t).slice(0, 220) }] }));
     const payload = { systemInstruction: { parts: [{ text: sys }] }, contents: [...hist, { role: 'user', parts: [{ text: txt }] }],
