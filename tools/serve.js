@@ -16,6 +16,7 @@ const server = http.createServer((req, res) => {
     const chunks = []; req.on('data', c => chunks.push(c)); req.on('end', () => { fs.writeFileSync(path.join(root, 'data', f), Buffer.concat(chunks)); res.end('ok'); }); return;
   }
   if (req.method === 'POST' && u.pathname === '/npc') return npcRoute(req, res);
+  if (req.method === 'POST' && u.pathname === '/npc-conversa') return npcConversaRoute(req, res);
   if (req.method !== 'GET' && req.method !== 'HEAD') { res.statusCode = 405; return res.end(); }
   let rel = decodeURIComponent(u.pathname); if (rel === '/') rel = '/index.html';
   if (rel === '/healthz') return res.end('ok');
@@ -48,44 +49,90 @@ async function pickModel() { // escolhe um modelo "flash" disponível para a cha
   if (!r.ok) throw new Error('modelos ' + r.status);
   const list = ((await r.json()).models || []).filter(m => (m.supportedGenerationMethods || []).includes('generateContent')).map(m => m.name.replace(/^models\//, ''));
   const bad = /(image|tts|audio|live|embed|vision|learnlm|exp|preview|thinking)/i;
-  const score = n => (/flash/i.test(n) ? 100 : 0) + (/lite/i.test(n) ? -5 : 0) + (bad.test(n) ? -60 : 0) + (parseFloat((n.match(/(\d+(\.\d+)?)/) || [0, 0])[1]) || 0);
+  // NPC precisa de resposta rápida: prefere "flash-lite" (rápido, limite grátis maior), depois "flash"
+  const score = n => (/flash/i.test(n) ? 100 : 0) + (/lite/i.test(n) ? 20 : 0) + (bad.test(n) ? -60 : 0) + (parseFloat((n.match(/(\d+(\.\d+)?)/) || [0, 0])[1]) || 0);
   list.sort((a, b) => score(b) - score(a));
   if (!list.length) throw new Error('nenhum modelo');
   gModel = list[0]; gModelAt = Date.now(); console.log('NPC: usando o modelo', gModel); return gModel;
 }
-const npcRate = new Map(); let npcGlobal = [];
+let npcGlobal = [], noThinkOk = null;
+// chamada ao Gemini que devolve JSON (com timeout e sem "pensar" quando o modelo aceita)
+async function geminiJSON(sys, contents, schema, temperature = 0.9) {
+  const model = await pickModel();
+  const payload = { systemInstruction: { parts: [{ text: sys }] }, contents, generationConfig: { temperature, maxOutputTokens: 1024, responseMimeType: 'application/json', responseSchema: schema } };
+  const call = body => fetch(`${GBASE}/models/${model}:generateContent`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GEMINI_KEY }, body: JSON.stringify(body), signal: AbortSignal.timeout(14000) });
+  let r;
+  if (noThinkOk !== false) { r = await call({ ...payload, generationConfig: { ...payload.generationConfig, thinkingConfig: { thinkingBudget: 0 } } }); if (r.status === 400) { noThinkOk = false; r = await call(payload); } else noThinkOk = true; }
+  else r = await call(payload);
+  if (!r.ok) { if (r.status !== 429) console.log('NPC: Gemini respondeu', r.status, (await r.text()).slice(0, 300)); if (r.status === 404) gModel = ''; return { status: r.status }; }
+  const j = await r.json(), out = (j.candidates?.[0]?.content?.parts || []).map(x => x.text || '').join('');
+  try { return { status: 200, obj: JSON.parse(out) }; } catch { return { status: 200, obj: null, raw: out }; }
+}
+// o que está em volta do NPC (mandado pelo jogo): pessoas, jogadores, lugares, rua, hora
+function arredores(a) {
+  a = a || {}; const L = [];
+  const pes = (Array.isArray(a.pessoas) ? a.pessoas : []).slice(0, 6).map(x => `${clean(x.nome).slice(0, 30)} (${clean(x.profissao).slice(0, 30)}, ${x.dist | 0} m, ${clean(x.fazendo).slice(0, 40)})`);
+  if (pes.length) L.push('Pessoas perto de você agora: ' + pes.join('; ') + '. Você conhece de vista quem mora na Ilha e pode dizer o nome delas.');
+  const jog = (Array.isArray(a.jogadores) ? a.jogadores : []).slice(0, 6).map(x => clean(x).slice(0, 20)).filter(Boolean);
+  if (jog.length) L.push('Outros jogadores por perto: ' + jog.join(', ') + '.');
+  const lug = (Array.isArray(a.lugares) ? a.lugares : []).slice(0, 6).map(x => clean(x).slice(0, 40)).filter(Boolean);
+  if (lug.length) L.push('Lugares que dá para ver daqui: ' + lug.join(', ') + '.');
+  if (a.rua) L.push('Vocês estão na ' + clean(a.rua).slice(0, 40) + '.');
+  if (a.noCarro) L.push('Vocês estão dentro de um carro, o jogador está dirigindo.');
+  if (a.hora) L.push('Agora são ' + clean(a.hora).slice(0, 10) + '.');
+  return L.join('\n');
+}
+const ACOES_SCHEMA = { type: 'OBJECT', properties: { fala: { type: 'STRING' }, acao: { type: 'STRING', enum: ACOES } }, required: ['fala', 'acao'] };
+function lerCorpo(req, max, fn) { let body = ''; req.on('data', c => { body += c; if (body.length > max) req.destroy(); }); req.on('end', () => { let m; try { m = JSON.parse(body); } catch { m = null; } fn(m); }); }
+const sendJ = (res, code, obj) => { res.statusCode = code; res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify(obj)); };
+// trava só contra abuso (alguém disparando centenas de pedidos); não há limite por jogador
+function abuso() { const now = Date.now(); npcGlobal = npcGlobal.filter(t => now - t < 60000); if (npcGlobal.length >= 300) return true; npcGlobal.push(now); return false; }
+
 function npcRoute(req, res) {
-  const send = (code, obj) => { res.statusCode = code; res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify(obj)); };
-  const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim(), now = Date.now();
-  const mine = (npcRate.get(ip) || []).filter(t => now - t < 60000); npcGlobal = npcGlobal.filter(t => now - t < 60000);
-  if (mine.length >= 8 || npcGlobal.length >= 40) return send(429, { erro: 'limite' });
-  let body = ''; req.on('data', c => { body += c; if (body.length > 6000) req.destroy(); });
-  req.on('end', async () => {
-    if (!GEMINI_KEY) return send(503, { erro: 'sem-chave' });
-    let m; try { m = JSON.parse(body); } catch { return send(400, { erro: 'json' }); }
-    const txt = clean(m.texto).slice(0, 220); if (!txt) return send(400, { erro: 'vazio' });
-    mine.push(now); npcRate.set(ip, mine); npcGlobal.push(now);
+  if (abuso()) return sendJ(res, 429, { erro: 'limite' });
+  lerCorpo(req, 16000, async m => {
+    if (!GEMINI_KEY) return sendJ(res, 503, { erro: 'sem-chave' });
+    if (!m) return sendJ(res, 400, { erro: 'json' });
+    const txt = clean(m.texto).slice(0, 220); if (!txt) return sendJ(res, 400, { erro: 'vazio' });
     const p = m.persona || {}, ctx = m.ctx || {};
     const sys = `Você é um NPC (pedestre) de um jogo de mundo aberto estilo GTA que se passa na Ilha dos Araújos, bairro de Governador Valadares (MG).
 Seu personagem: ${clean(p.nome).slice(0, 30)}, ${p.idade | 0} anos, ${clean(p.profissao).slice(0, 40)}, jeito ${clean(p.jeito).slice(0, 30)}.
-Situação agora: o jogador ${ctx.armado ? `está com ${clean(ctx.arma).slice(0, 20)} na mão` : 'está desarmado'}${ctx.mirando ? ' e APONTANDO a arma para você' : ''}. Você ${ctx.jaDeuDinheiro ? 'já entregou seu dinheiro para ele antes' : `tem R$ ${ctx.dinheiro | 0} na carteira`}.
-Você é uma pessoa de verdade: tem nome, família, opiniões, gostos, lembranças do bairro e responde QUALQUER pergunta normalmente e com conteúdo (nunca responda só com bordões como "trem bão"). Se perguntarem algo que você não sabe, invente uma resposta plausível de morador da Ilha.
+Situação agora: o jogador ${ctx.armado ? `está com ${clean(ctx.arma).slice(0, 20)} na mão` : 'está desarmado'}${ctx.mirando ? ' e APONTANDO a arma para você' : ''}. Você ${ctx.jaDeuDinheiro ? 'já entregou seu dinheiro para ele antes' : `tem R$ ${ctx.dinheiro | 0} na carteira`}.${ctx.algemado ? ' Você está ALGEMADO pelo jogador.' : ''}${ctx.refem ? ' Você é REFÉM do jogador e está indo junto com ele.' : ''}
+${arredores(ctx.arredores)}
+Você é uma pessoa de verdade: tem nome, família, opiniões, gostos, lembranças do bairro e responde QUALQUER pergunta normalmente e com conteúdo (nunca responda só com bordões como "trem bão"). Se perguntarem quem é alguém que está perto, use o nome e a profissão da lista acima. Se perguntarem algo que você não sabe, invente uma resposta plausível de morador da Ilha.
 Responda SEMPRE em português do Brasil, coloquial e mineiro, em 1 a 3 frases curtas, como fala natural (vai virar voz). Fique sempre no personagem; nunca diga que é uma IA ou um NPC.
 Você AMA a sua vida e tem muito medo de morrer. Se o jogador estiver armado, você obedece TUDO o que ele mandar (entregar dinheiro, levantar as mãos, deitar, ir junto com ele / entrar no carro num sequestro, ficar quieto), implora pela vida, fala da família e tenta acalmá-lo; só tenta fugir se ele se distrair ou mandar você ir embora. Desarmado, você reage conforme seu jeito: pode recusar, discutir, rir ou sair andando.
 Lembre o que já foi dito na conversa e continue o assunto.
 Escolha também UMA ação para o seu boneco fazer no jogo: nenhuma, maos (levantar as mãos), dinheiro (entregar o dinheiro), deitar (deitar no chão), seguir (seguir o jogador), fugir (sair correndo), parar (ficar parado), liberar (voltar a andar normal), policia (dizer que vai chamar a polícia e sair andando rápido).`;
-    const hist = (Array.isArray(m.hist) ? m.hist : []).slice(-8).map(h => ({ role: h.r === 'npc' ? 'model' : 'user', parts: [{ text: clean(h.t).slice(0, 220) }] }));
-    const payload = { systemInstruction: { parts: [{ text: sys }] }, contents: [...hist, { role: 'user', parts: [{ text: txt }] }],
-      generationConfig: { temperature: 0.9, maxOutputTokens: 1024, responseMimeType: 'application/json', responseSchema: { type: 'OBJECT', properties: { fala: { type: 'STRING' }, acao: { type: 'STRING', enum: ACOES } }, required: ['fala', 'acao'] } } };
+    const hist = (Array.isArray(m.hist) ? m.hist : []).slice(-10).map(h => ({ role: h.r === 'npc' ? 'model' : 'user', parts: [{ text: clean(h.t).slice(0, 220) }] }));
     try {
-      const model = await pickModel();
-      const r = await fetch(`${GBASE}/models/${model}:generateContent`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GEMINI_KEY }, body: JSON.stringify(payload) });
-      if (r.status === 429) return send(429, { erro: 'limite' });
-      if (!r.ok) { console.log('NPC: Gemini respondeu', r.status, (await r.text()).slice(0, 300)); if (r.status === 404) gModel = ''; return send(502, { erro: 'ia' }); }
-      const j = await r.json(), out = (j.candidates?.[0]?.content?.parts || []).map(x => x.text || '').join('');
-      let o; try { o = JSON.parse(out); } catch { o = { fala: out.slice(0, 200), acao: 'nenhuma' }; }
-      send(200, { fala: clean(o.fala).slice(0, 240) || '...', acao: ACOES.includes(o.acao) ? o.acao : 'nenhuma' });
-    } catch (e) { console.log('NPC: erro', e.message); send(502, { erro: 'ia' }); }
+      const g = await geminiJSON(sys, [...hist, { role: 'user', parts: [{ text: txt }] }], ACOES_SCHEMA);
+      if (g.status === 429) return sendJ(res, 429, { erro: 'limite' });
+      if (g.status !== 200) return sendJ(res, 502, { erro: 'ia' });
+      const o = g.obj || { fala: (g.raw || '').slice(0, 200), acao: 'nenhuma' };
+      sendJ(res, 200, { fala: clean(o.fala).slice(0, 240) || '...', acao: ACOES.includes(o.acao) ? o.acao : 'nenhuma' });
+    } catch (e) { console.log('NPC: erro', e.name, e.message); sendJ(res, e.name === 'TimeoutError' ? 504 : 502, { erro: e.name === 'TimeoutError' ? 'demorou' : 'ia' }); }
+  });
+}
+// dois pedestres conversando entre si (o jogo pede quando o jogador está perto)
+function npcConversaRoute(req, res) {
+  if (abuso()) return sendJ(res, 429, { erro: 'limite' });
+  lerCorpo(req, 12000, async m => {
+    if (!GEMINI_KEY) return sendJ(res, 503, { erro: 'sem-chave' });
+    if (!m || !m.a || !m.b) return sendJ(res, 400, { erro: 'json' });
+    const pp = x => `${clean(x.nome).slice(0, 30)}, ${x.idade | 0} anos, ${clean(x.profissao).slice(0, 40)}, jeito ${clean(x.jeito).slice(0, 30)}`;
+    const sys = `Escreva um diálogo curto e natural entre dois moradores da Ilha dos Araújos (Governador Valadares, MG) que se encontraram na rua, para um jogo de mundo aberto.
+Pessoa 0: ${pp(m.a)}. Pessoa 1: ${pp(m.b)}.
+${arredores(m.ctx)}
+${m.ctx && m.ctx.tiros ? 'Teve tiro por perto agora há pouco: eles estão assustados e comentam isso.' : ''}${m.ctx && m.ctx.evento ? ' Acabou de acontecer: ' + clean(m.ctx.evento).slice(0, 120) + '.' : ''}
+Português do Brasil coloquial e mineiro. 4 a 6 falas alternadas, cada uma com no máximo 1 ou 2 frases curtas. Assuntos do dia a dia (família, trabalho, futebol, fofoca do bairro, preço das coisas, o calor de Valadares, o que está acontecendo em volta). Sem narração, só as falas.`;
+    try {
+      const g = await geminiJSON(sys, [{ role: 'user', parts: [{ text: 'Escreva o diálogo.' }] }], { type: 'OBJECT', properties: { falas: { type: 'ARRAY', items: { type: 'OBJECT', properties: { quem: { type: 'INTEGER' }, fala: { type: 'STRING' } }, required: ['quem', 'fala'] } } }, required: ['falas'] }, 1.0);
+      if (g.status === 429) return sendJ(res, 429, { erro: 'limite' });
+      if (g.status !== 200 || !g.obj) return sendJ(res, 502, { erro: 'ia' });
+      const falas = (Array.isArray(g.obj.falas) ? g.obj.falas : []).slice(0, 8).map(f => ({ quem: f.quem ? 1 : 0, fala: clean(f.fala).slice(0, 200) })).filter(f => f.fala);
+      sendJ(res, 200, { falas });
+    } catch (e) { sendJ(res, 502, { erro: 'ia' }); }
   });
 }
 

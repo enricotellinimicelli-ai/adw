@@ -1002,7 +1002,7 @@ function flushPeople(M) { for (const k in M) { M[k].instanceMatrix.needsUpdate =
 // pedestres andando nas calçadas
 const walkLoops = [];
 for (const bl of W.blocks) if (bl.kind === 'res' || bl.kind === 'shop' || bl.kind === 'apt' || bl.kind === 'park') { const p = clean(bl.p); if (p.length > 2 && Math.abs(area(p)) > 400) { const L = inset(p, 1.1); let len = 0; const segs = []; for (let i = 0; i < L.length; i++) { const a = L[i], b = L[(i + 1) % L.length], l = Math.hypot(b[0] - a[0], b[1] - a[1]); segs.push({ a, b, l, s: len }); len += l; } walkLoops.push({ segs, len }); } }
-const NPED = 110, peds = [], pr = rng(5);
+const NPED = 200, peds = [], pr = rng(5);
 const PM = makePeople(NPED + 1); // último = jogador
 for (let i = 0; i < NPED; i++) {
   const loop = walkLoops[Math.floor(pr() * walkLoops.length)];
@@ -1424,8 +1424,24 @@ function updateTraffic(dt) {
     c.y = c.ed.r.t.bridge ? 0.6 : 0.04;
   }
 }
+// pedestres longe de tudo (que ninguém vê) vão sendo trazidos para as calçadas em volta do jogador:
+// a rua fica sempre movimentada e ninguém some de perto de você
+for (const L of walkLoops) { let x = 0, z = 0; for (const g of L.segs) { x += g.a[0]; z += g.a[1]; } L.c = [x / L.segs.length, z / L.segs.length]; }
+let recicla = 0;
+function reciclarPeds() {
+  for (let k = 0; k < 4; k++) {
+    const p = peds[recicla = (recicla + 1) % NPED];
+    if (p.dead > 0 || p.cuffed || p.act || p.conversa || p.riding || p.panic > 0) continue;
+    if (Math.hypot(p.x - player.x, p.z - player.z) < 170) continue;
+    const perto = walkLoops.filter(L => { const d = Math.hypot(L.c[0] - player.x, L.c[1] - player.z); return d > 35 && d < 120; });
+    if (!perto.length) continue;
+    p.loop = perto[Math.floor(Math.random() * perto.length)]; p.s = Math.random() * p.loop.len; p.off = [0, 0];
+    const q = loopPos(p.loop, p.s); p.x = q[0]; p.z = q[1];
+  }
+}
 function updatePeds(dt) {
   const pc = player.inCar;
+  reciclarPeds();
   for (let i = 0; i < NPED; i++) {
     const p = peds[i];
     // baleado: fica caído e depois volta a andar
@@ -1447,6 +1463,14 @@ function updatePeds(dt) {
         if (p.riding && !player.inCar) { p.riding = false; p.x = player.x + 1.4; p.z = player.z + 1.0; }
       }
       const dx = player.x - p.x, dz = player.z - p.z, d = Math.hypot(dx, dz);
+      if (a === 'ouvir' && d > 9) { p.act = null; continue; } // só volta a andar quando você se afasta
+      if (a === 'papo' && p.act.face) { // conversando com outro pedestre: chega perto e fica virado para ele
+        const f = p.act.face, fx = f.x - p.x, fz = f.z - p.z, fd = Math.hypot(fx, fz);
+        if (p.act.goto && fd > 1.4) { const s = Math.min(fd - 1.4, 1.6 * dt); p.x += fx / fd * s; p.z += fz / fd * s; p.phase += dt * 5; }
+        p.yaw = Math.atan2(fx, fz); const o2 = pushOut(p.x, p.z, 0.3); p.x = o2.x; p.z = o2.z; p.y = groundY(p.x, p.z);
+        poseMan(PM, i, p.x, p.y, p.z, p.yaw, p.phase + Math.sin(performance.now() / 300 + i) * 0.4, p.act.goto && fd > 1.4 ? 0.5 : 0.12, p.look);
+        const q = loopPos(p.loop, p.s); p.off = [p.x - q[0], p.z - q[1]]; if (p.act.time <= 0) p.act = null; continue;
+      }
       if (a === 'seguir' && d > 2 && d < 40 && !player.inCar) { const s = Math.min(d - 2, (d > 5 ? 6.8 : 3.4) * dt); p.x += dx / d * s; p.z += dz / d * s; p.phase += dt * 9; }
       if (a !== 'deitar') p.yaw = Math.atan2(dx, dz);
       const o = pushOut(p.x, p.z, 0.3); p.x = o.x; p.z = o.z; p.y = groundY(p.x, p.z);
@@ -1589,7 +1613,7 @@ combat = createCombat({ THREE, scene, camera, canvas, player, peds, pushOut, gro
   recoil: a => { camPitch = clamp(camPitch - a, -0.9, 1.35); },
   respawn: () => { if (player.inCar) toggleCar(); player.x = SPAWN.x; player.z = SPAWN.z; player.y = groundY(SPAWN.x, SPAWN.z) + 0.2; player.vx = player.vz = player.vy = 0; camTarget.set(player.x, 1.6, player.z); },
   _x: 0, leaveCar: () => { if (player.inCar) { const c = player.inCar; c.mode = 'parked'; c.speed = 0; player.x = c.x + Math.sin(c.h) * 2.3; player.z = c.z - Math.cos(c.h) * 2.3; player.inCar = null; } } });
-npcTalk = createNPC({ THREE, camera, player, peds, combat, addChat, $ });
+npcTalk = createNPC({ THREE, camera, player, peds, combat, addChat, $, landmarks, remotes: () => net ? net.others : null, rua: () => lastRoad });
 btn.onclick = () => {
   $('intro').style.display = 'none'; Promise.resolve(canvas.requestPointerLock?.()).catch(() => {});
   const name = nickIn.value.trim().slice(0, 16) || 'Jogador'; try { localStorage.setItem('ilha_nome', name); } catch {}
